@@ -1,4 +1,6 @@
+from os import getenv
 from typing import List
+
 
 from pydantic import BaseSettings
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,7 +13,17 @@ class Settings(BaseSettings):
     PROJECT_DESCRIPTION: str = 'Projeto básico para segunraça com FastAPI'
     PROJECT_VERSION: str = '0.0.1'
 
-    DB_URL: str = 'postgresql+asyncpg://postgres:mysecretpassword@localhost:5431/faculdade'
+    SQL_DB: str = getenv('SQL_DB', 'postgresql+asyncpg')
+    DB_USER: str = getenv('DB_USER', 'postgres')
+    DB_PASSWORD: str = getenv('DB_PASSWORD', 'mysecretpassword')
+    DB_URL: str = getenv('DB_URL', 'localhost')
+    DB_PORT: str = getenv('DB_PORT', '5431')
+    DB_NAME: str = getenv('DB_NAME', 'faculdade')
+
+    DB_URI: str = (
+        f'{SQL_DB}://{DB_USER}:{DB_PASSWORD}@{DB_URL}:{(DB_PORT)}/{DB_NAME}'
+    )
+    # 'postgresql+asyncpg://postgres:mysecretpassword@localhost:5431/faculdade'
     DBBaseModel = declarative_base()
 
     JWT_SECRET: str = 'n6zkK17BwjftaaiI2SgJ0iGpAq_mCK8MQuhfff0nv_Y'
