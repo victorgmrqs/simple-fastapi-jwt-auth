@@ -78,14 +78,13 @@ async def get_usuario(
     async with session:
         query = select(UsuarioModel).filter(UsuarioModel.id == usuario_id)
         result = await session.execute(query)
-        usuario: UsuarioModel = result.scalars().unique().one_or_none()
-
-        if not usuario:
+        if usuario := result.scalars().unique().one_or_none():
+            return usuario
+        else:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail='Usuario não encontrado',
             )
-        return usuario
 
 
 @router.patch(
@@ -118,7 +117,6 @@ async def patch_usuario(
         if usuario.email:
             usuario_up.email = usuario.email
 
-        if usuario.email:
             usuario_up.email = usuario.email
         if usuario.admin:
             usuario_up.admin = usuario.admin

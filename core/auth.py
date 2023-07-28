@@ -38,28 +38,22 @@ async def autenticar(
     async with db as session:
         query = select(UsuarioModel).where(UsuarioModel.email == email)
         result = await session.execute(query)
-        usuario: UsuarioModel = result.scalars().unique().one_or_none()
-
-        if not usuario:
+        if usuario := result.scalars().unique().one_or_none():
+            return None if not await verificar_senha(password, usuario.senha) else usuario
+        else:
             return None
-
-        if not await verificar_senha(password, usuario.senha):
-            return None
-        return usuario
 
 
 def _criar_token(tipo_token: str, tempo_vida: timedelta, sub: str) -> str:
-    # NOTE: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
-    payload: dict = {}
-
     sp: timezone = timezone('America/Sao_Paulo')
     expira: datetime = datetime.now(tz=sp) + tempo_vida
 
-    payload['type'] = tipo_token
-    payload['exp'] = expira
-    payload['iat'] = datetime.now(tz=sp)
-    payload['sub'] = str(sub)
-
+    payload: dict = {
+        'type': tipo_token,
+        'exp': expira,
+        'iat': datetime.now(tz=sp),
+        'sub': sub,
+    }
     return jwt.encode(
         payload, settings.JWT_SECRET, algorithm=settings.ALGORITHM
     )
