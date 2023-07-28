@@ -97,7 +97,6 @@ async def update_artigo(
         if artigo.descricao:
             artigo_up.descricao = artigo.descricao
 
-        if artigo.descricao:
             artigo_up.descricao = artigo.descricao
 
         if artigo.url_fonte:
